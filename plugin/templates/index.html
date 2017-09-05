@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+</head>
+<body>
+<h1>Data Upload</h1>
+<form >
+    <label for="select_model">Select model to upload data</label> : <select name="model" id="select_model">
+    {% for model in models %}
+        <option value="{{ model }}">{{model}}</option>
+    {% endfor %}
+    </select>
+    <br/>
+
+</form>
+<script type="text/javascript">
+    var createElement;
+    var el=document.getElementById("select_model");
+    el.addEventListener("change",function(event){
+        selected_model = event.target.options[event.target.selectedIndex].text;
+        xhttp= new XMLHttpRequest()
+        xhttp.open("GET","{%  url 'get_model_fields' %}?model="+selected_model,true);
+        xhttp.onreadystatechange = function () {
+            if(this.readyState == 4 && this.status == 200)
+            {
+                response = JSON.parse(this.responseText).fields;
+                form = document.forms[0];
+                for (var i =0;i< response.length;i++){
+                    form.appendChild(createElement(response[i]))
+                }
+
+            }
+        };
+        xhttp.send();
+    },false);
+
+
+    //function to create the element
+    createElement = function(item){
+        var div = document.createElement("div");
+        var label = document.createElement(item)
+        label.innerHTML=item+": "
+        var select = document.createElement("select")
+        //append the options to the select
+        for(var i=0;i<10;i++){
+            var option = document.createElement("option")
+            option.setAttribute("value",i);
+            option.innerHTML = i;
+            select.appendChild(option)
+        }
+        div.appendChild(label);
+        div.appendChild(select);
+        return div;
+        }
+</script>
+</body>
+</html>
