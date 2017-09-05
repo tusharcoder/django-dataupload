@@ -1,0 +1,49 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+</head>
+<body>
+<form enctype="multipart/form-data">
+    <label for="upload_document">
+        Upload Document
+    </label>
+    <input name="document" id="upload_document" type="file">
+</form>
+<script lang="javascript" src="/static/js/xlsx.full.min.js"></script>
+<script type="text/javascript">
+    var filereader = new FileReader();
+    el = document.getElementById("upload_document");
+    el.addEventListener("change",function(event){
+        alert(this.value);
+        filereader.readAsDataURL(this.files[0])
+    });
+
+    filereader.onload=function(){
+        //here we read the file and get the columns
+        //alert("reading the file");
+        var dataURL = filereader.result;
+        readExcel(dataURL);
+    };
+
+    //function to read the excel file
+    function readExcel(file){
+        var data = XLSX.read(file,{"type":"base64"})
+        sheets = data.Sheets;
+
+        //select the columns of the first sheet
+        var sheet;
+        for(var v in sheets){
+            sheet = sheets[v];
+            break;
+        }
+        var sheetToJson = XLSX.utils.sheet_to_json(sheet);
+        console.log(sheetToJson)
+    }
+
+</script>
+</body>
+</html>

@@ -29,4 +29,11 @@ def getModelFields(request):
 
 
 
+def uploadExcelSheet(request):
+    """function to upload the excel sheet"""
+    if request.method=="GET":
+        return render(request,"upload.html",{"title":"Upload File"})
+
+    if request.method =="POST":
+        """function to handle the post request to upload the excel and process it"""
 

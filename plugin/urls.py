@@ -10,12 +10,12 @@
 
 
 from django.conf.urls import include, url
-from .views import renderView, getModelFields
+from .views import renderView, getModelFields, uploadExcelSheet
 
 urlpatterns = [
  url(r'^$', renderView, name='index'),
 
  #ajax views
- url(r'^getModelFields/$',getModelFields,name="get_model_fields")
-
+ url(r'^getModelFields/$',getModelFields,name="get_model_fields"),
+ url(r'^uploadFile/$',uploadExcelSheet,name="upload_file")
 ]
