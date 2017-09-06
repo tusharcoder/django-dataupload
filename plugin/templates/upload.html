@@ -7,43 +7,29 @@
     <title>{{ title }}</title>
 </head>
 <body>
-<form enctype="multipart/form-data">
-    <label for="upload_document">
-        Upload Document
-    </label>
-    <input name="document" id="upload_document" type="file">
+<h1>Upload data in {{ model }}</h1>
+<form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {% for field in model_fields %}
+        <div>
+        <label for="{{ field.name }}">{{ field.name }} {% if field.null_not_allowed == True %}
+        *
+        {% endif %} : </label>
+        <select name="{{ field.name }}" id="{{ field.name }}">
+        {% for sheet_column in sheet_columns %}
+            <option value="{{ sheet_column }}">{{ sheet_column }}</option>
+        {% endfor %}
+        </select>
+        {% if field.null_not_allowed == False %}
+        <input type="button" value="Delete" id="delete" onclick="this.closest('div').remove()">
+        {% endif %}
+        <br/>
+        <br/>
+                </div>
+    {% endfor %}
+
+    <input type="submit" value="submit">
+
 </form>
-<script lang="javascript" src="/static/js/xlsx.full.min.js"></script>
-<script type="text/javascript">
-    var filereader = new FileReader();
-    el = document.getElementById("upload_document");
-    el.addEventListener("change",function(event){
-        alert(this.value);
-        filereader.readAsDataURL(this.files[0])
-    });
-
-    filereader.onload=function(){
-        //here we read the file and get the columns
-        //alert("reading the file");
-        var dataURL = filereader.result;
-        readExcel(dataURL);
-    };
-
-    //function to read the excel file
-    function readExcel(file){
-        var data = XLSX.read(file,{"type":"base64"})
-        sheets = data.Sheets;
-
-        //select the columns of the first sheet
-        var sheet;
-        for(var v in sheets){
-            sheet = sheets[v];
-            break;
-        }
-        var sheetToJson = XLSX.utils.sheet_to_json(sheet);
-        console.log(sheetToJson)
-    }
-
-</script>
 </body>
 </html>
