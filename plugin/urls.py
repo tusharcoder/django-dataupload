@@ -12,8 +12,7 @@
 from django.conf.urls import include, url
 from django.views.decorators.csrf import csrf_exempt
 
-from .views import renderView, getModelFields, uploadExcelSheet
-
+from .views import renderView, getModelFields, uploadExcelSheet, SuccessView
 
 urlpatterns = [
  url(r'^$', renderView, name='index'),
@@ -21,4 +20,5 @@ urlpatterns = [
  #ajax views
  url(r'^getModelFields/$',getModelFields,name="get_model_fields"),
  url(r'^uploadData/$',uploadExcelSheet,name="upload_data"),
+ url(r'^success/$',SuccessView,name="success_view"),
 ]

@@ -8,7 +8,7 @@
 </head>
 <body>
 <h1>Upload data in {{ model }}</h1>
-<form enctype="multipart/form-data" action="/getFileHeaders/" method="post">
+<form enctype="multipart/form-data" method="post">
     {% csrf_token %}
     {% for field in model_fields %}
         <label for="{{ field }}">{{ field }} : </label>

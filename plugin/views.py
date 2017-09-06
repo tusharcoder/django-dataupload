@@ -21,7 +21,7 @@ def getFields(model=None):
     app=model.split(".")[0]
     model_name=model.split(".")[1]
     model = apps.get_model(app_label=app,model_name=model_name)
-    fields=model._meta.get_fields()
+    fields=(i.name for i in model._meta.get_fields() if not i.name == model._meta.pk.name)
     return [str(field) for field in fields]
 
 
@@ -48,7 +48,7 @@ def renderView(request):
         #dump all data in session
         request.session["file_path"] = file_path
         request.session["model_fields"] = model_fields
-        request.session["sheet_fields"] = [str(i) for i in first_row]
+        request.session["sheet_fields"] = [i.value for i in first_row]
         request.session["model"] = model
         return redirect("upload_data", permanent=True)
 
@@ -83,6 +83,41 @@ def uploadExcelSheet(request):
                  }
         return render(request,"upload.html",context)
 
+    if request.method == "POST":
+        """function handle the request data, save the model according to the mapping select by the user"""
+        model = request.session.get("model")
+        app = model.split(".")[0]
+        model_name = model.split(".")[1]
+        model = apps.get_model(app_label=app, model_name=model_name)
+        file_path = request.session.get("file_path")
+        wb = xlrd.open_workbook(filename=file_path)
+        sheet = wb.sheet_by_index(0)
+        header_column=None
+        #mapping of the rows:
+        data = request.POST
+        model_fields = getFields(app+'.'+model_name)
+        for rownum in range(sheet.nrows):
+            row = sheet.row_slice(rownum, start_colx=0, end_colx=None)
+            if rownum==0:
+                header_column=[i.value for i in row]
+            rowdata = dict(zip(header_column,row))
+            if not rownum == 0:
+                model_data={}
+                for field in model_fields:
+                    if field in data:
+                        # try:
+                            model_data.update({field.split(".")[-1]:rowdata[data[field]].value})
+                        # except:
+                        #     pass
+                #get the model instance
+                model = apps.get_model(app_label=app, model_name=model_name)()
+                #set the attributes
+                for i in model_data.items():
+                    setattr(model, i[0], i[1])
+                #save the model
+                model.save()
+        return redirect("success_view",permanent=True)
+
 
 
 def randomname_generator(size=6, chars=string.ascii_lowercase + string.digits):
@@ -100,9 +135,16 @@ def uploadFile(request):
     fout.close()
     return file_full_path
 
-def uploadData(request):
+def SuccessView(request):
     """function to upload the data"""
     if request.method=="GET":
-        return render(request,"upload.html",{"title":"Upload Data"})
+        try:
+            del request.session["file_path"]
+            del request.session["model_fields"]
+            del request.session["sheet_fields"]
+            del request.session["model"]
+        except:
+            pass
+        return render(request,"success.html",{"title":"Success | Data Upload plugin"})
 
 
