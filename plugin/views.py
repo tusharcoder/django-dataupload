@@ -21,8 +21,8 @@ def getFields(model=None):
     app=model.split(".")[0]
     model_name=model.split(".")[1]
     model = apps.get_model(app_label=app,model_name=model_name)
-    fields=(i.name for i in model._meta.get_fields() if not i.name == model._meta.pk.name)
-    return [str(field) for field in fields]
+    fields=list({"name":i.name,"null_not_allowed":not i.null} for i in model._meta.get_fields() if not i.name == model._meta.pk.name)
+    return fields
 
 
 def renderView(request):
@@ -104,9 +104,9 @@ def uploadExcelSheet(request):
             if not rownum == 0:
                 model_data={}
                 for field in model_fields:
-                    if field in data:
+                    if field.get("name") in data:
                         # try:
-                            model_data.update({field.split(".")[-1]:rowdata[data[field]].value})
+                            model_data.update({field.get("name").split(".")[-1]:rowdata[data[field.get("name")]].value})
                         # except:
                         #     pass
                 #get the model instance

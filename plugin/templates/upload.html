@@ -11,14 +11,21 @@
 <form enctype="multipart/form-data" method="post">
     {% csrf_token %}
     {% for field in model_fields %}
-        <label for="{{ field }}">{{ field }} : </label>
-        <select name="{{ field }}" id="{{ field }}">
+        <div>
+        <label for="{{ field.name }}">{{ field.name }} {% if field.null_not_allowed == True %}
+        *
+        {% endif %} : </label>
+        <select name="{{ field.name }}" id="{{ field.name }}">
         {% for sheet_column in sheet_columns %}
             <option value="{{ sheet_column }}">{{ sheet_column }}</option>
         {% endfor %}
         </select>
+        {% if field.null_not_allowed == False %}
+        <input type="button" value="Delete" id="delete" onclick="this.closest('div').remove()">
+        {% endif %}
         <br/>
         <br/>
+                </div>
     {% endfor %}
 
     <input type="submit" value="submit">
