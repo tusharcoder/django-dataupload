@@ -21,7 +21,7 @@ def getFields(model=None):
     app=model.split(".")[0]
     model_name=model.split(".")[1]
     model = apps.get_model(app_label=app,model_name=model_name)
-    fields=list({"name":i.name,"null_not_allowed":not i.null} for i in model._meta.get_fields() if not i.name == model._meta.pk.name)
+    fields=list({"name":i.name,"null_not_allowed":not i.null} for i in model._meta.get_fields() if (not i.name == model._meta.pk.name) and (not i.is_relation))
     return fields
 
 
